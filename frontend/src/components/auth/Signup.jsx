@@ -10,6 +10,10 @@ import axios from 'axios'
 import { USER_API_END_POINT } from '@/utils/constant'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import store from '@/redux/store'
+import { useDispatch, useSelector } from 'react-redux'
+import { setLoading } from '@/redux/authSlice'
+import { Loader2 } from 'lucide-react'
 
 const Signup = () => {
     const [input, setInput] = useState({
@@ -20,6 +24,9 @@ const Signup = () => {
         role: "",
         file: ""
     })
+
+    const { loading } = useSelector(store => store.auth)
+    const dispatch = useDispatch();
 
     const router = useRouter();
 
@@ -43,6 +50,7 @@ const Signup = () => {
             formData.append("file", input.file)
         }
         try {
+            dispatch(setLoading(true))
             const response = await axios.post(`${USER_API_END_POINT}/register`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
@@ -56,6 +64,9 @@ const Signup = () => {
         } catch (error) {
             console.log(error)
             toast.error(error.response.data.message)
+        }
+        finally {
+            dispatch(setLoading(false))
         }
     }
 
@@ -154,13 +165,15 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    <Button
-                        variant="outline"
-                        type="submit"
-                        className="w-full my-4 bg-black text-white py-3 rounded-md text-lg hover:bg-gray-800 hover:text-white"
-                    >
-                        Register
-                    </Button>
+                    {
+                        loading ? <Button className="w-full my-4 bg-black text-white"><Loader2 className='mr-2 h-4 w-4 animate-spin' />Setting up things...</Button> : <Button
+                            variant="outline"
+                            type="submit"
+                            className="w-full my-4 bg-black text-white py-3 rounded-md text-lg hover:bg-gray-800 hover:text-white"
+                        >
+                            Register
+                        </Button>
+                    }
 
                     <div className="text-center text-sm mt-4">
                         <span>Already have an account? </span>

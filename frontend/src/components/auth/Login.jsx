@@ -10,6 +10,10 @@ import { USER_API_END_POINT } from '@/utils/constant'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { setLoading } from '@/redux/authSlice'
+import store from '@/redux/store'
+import { Loader2 } from 'lucide-react'
 
 const Login = () => {
     const [input, setInput] = useState({
@@ -18,7 +22,9 @@ const Login = () => {
         role: "",
     })
 
+    const { loading } = useSelector(store => store.auth)
     const router = useRouter();
+    const dispatch = useDispatch();
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value })
     }
@@ -28,6 +34,7 @@ const Login = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
+            dispatch(setLoading(true))
             const response = await axios.post(`${USER_API_END_POINT}/login`, input, {
                 headers: {
                     "Content-Type": "application/json"
@@ -41,7 +48,9 @@ const Login = () => {
         } catch (error) {
             console.log(error)
             toast.error(error.response.data.message)
-
+        }
+        finally {
+            dispatch(setLoading(false))
         }
     }
 
@@ -108,15 +117,17 @@ const Login = () => {
                         </RadioGroup>
                     </div>
 
+                    {
+                        loading ? <Button className="w-full my-4 bg-black text-white"><Loader2 className='mr-2 h-4 w-4 animate-spin' />Getting you there..</Button> : <Button
+                            variant="outline"
+                            type="submit"
+                            className="w-full my-4 bg-black text-white py-3 rounded-md text-lg hover:bg-gray-800 hover:text-white"
+                        >
+                            Login
+                        </Button>
+                    }
 
 
-                    <Button
-                        variant="outline"
-                        type="submit"
-                        className="w-full my-4 bg-black text-white py-3 rounded-md text-lg hover:bg-gray-800 hover:text-white"
-                    >
-                        Login
-                    </Button>
 
                     <div className="text-center text-sm mt-4">
                         <span>Don't have an account? </span>
