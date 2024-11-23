@@ -6,36 +6,66 @@ import { Input } from '../ui/input'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Button } from '../ui/button'
 import Link from 'next/link'
+import axios from 'axios'
+import { USER_API_END_POINT } from '@/utils/constant'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 const Signup = () => {
     const [input, setInput] = useState({
         fullname: "",
-        email:"",
-        phoneNumber:"",
+        email: "",
+        phoneNumber: "",
         password: "",
         role: "",
         file: ""
     })
 
+    const router = useRouter();
+
     const changeEventHandler = (e) => {
-        setInput({...input, [e.target.name]:e.target.value})
+        setInput({ ...input, [e.target.name]: e.target.value })
     }
 
-    const changeFileHandler = (e) =>{
-        setInput({...input, file:e.target.files?.[0]})
+    const changeFileHandler = (e) => {
+        setInput({ ...input, file: e.target.files?.[0] })
     }
 
     const submitHandler = async (e) => {
         e.preventDefault();
-        console.log(input)
+        const formData = new FormData();
+        formData.append("fullname", input.fullname);
+        formData.append("email", input.email);
+        formData.append("phoneNumber", input.phoneNumber);
+        formData.append("password", input.password);
+        formData.append("role", input.role);
+        if (input.file) {
+            formData.append("file", input.file)
+        }
+        try {
+            const response = await axios.post(`${USER_API_END_POINT}/register`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                },
+                withCredentials: true
+            });
+            if (response.data.success) {
+                router.push("/login");
+                toast.success(response.data.message)
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error(error.response.data.message)
+        }
     }
+
     return (
         <div>
             <Navbar />
             <div className="flex items-center justify-center max-w-7xl mx-auto px-4">
                 <form onSubmit={submitHandler} className="w-full sm:w-4/5 md:w-1/2 lg:w-1/3 border border-gray-300 rounded-lg p-6 my-10 shadow-lg bg-white">
                     <h1 className="font-bold text-2xl mb-6 text-center">Sign Up</h1>
-                    
+
                     <div className="my-4">
                         <Label>Full Name</Label>
                         <Input
@@ -47,7 +77,7 @@ const Signup = () => {
                             onChange={changeEventHandler}
                         />
                     </div>
-                    
+
                     <div className="my-4">
                         <Label>Email</Label>
                         <Input
@@ -59,7 +89,7 @@ const Signup = () => {
                             onChange={changeEventHandler}
                         />
                     </div>
-                    
+
                     <div className="my-4">
                         <Label>Phone Number</Label>
                         <Input
@@ -71,7 +101,7 @@ const Signup = () => {
                             onChange={changeEventHandler}
                         />
                     </div>
-                    
+
                     <div className="my-4">
                         <Label>Password</Label>
                         <Input
@@ -83,8 +113,8 @@ const Signup = () => {
                             onChange={changeEventHandler}
                         />
                     </div>
-                    
-                   
+
+
                     <div className="my-4">
                         <RadioGroup className="flex items-center gap-6 my-4">
                             <div className="flex items-center space-x-2">
@@ -124,18 +154,18 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    <Button 
-                        variant="outline" 
-                        type="submit" 
+                    <Button
+                        variant="outline"
+                        type="submit"
                         className="w-full my-4 bg-black text-white py-3 rounded-md text-lg hover:bg-gray-800 hover:text-white"
                     >
                         Register
                     </Button>
-                    
+
                     <div className="text-center text-sm mt-4">
                         <span>Already have an account? </span>
                         <Link href="/login"
-                             className="text-blue-600 hover:underline">Login
+                            className="text-blue-600 hover:underline">Login
                         </Link>
                     </div>
                 </form>
