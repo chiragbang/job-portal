@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { setLoading } from '@/redux/authSlice'
+import { setLoading, setUser } from '@/redux/authSlice'
 import store from '@/redux/store'
 import { Loader2 } from 'lucide-react'
 
@@ -42,12 +42,14 @@ const Login = () => {
                 withCredentials: true
             });
             if (response.data.success) {
+                dispatch(setUser(response.data.user))
                 router.push("/");
                 toast.success(response.data.message)
             }
         } catch (error) {
             console.log(error)
             toast.error(error.response.data.message)
+            console.log(error.response.data.message)
         }
         finally {
             dispatch(setLoading(false))
