@@ -18,18 +18,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
-// const corsOptions = {
-//     origin: 'http://localhost:3000',
-//     origin: '*',
-//     credentials: true
-// }
-// app.use(cors(corsOptions))
-
 const corsOptions = {
-    origin: 'https://3000-chiragbang-jobportal-1r2ru5p7j8i.ws-us116.gitpod.io',  // Replace with your frontend URL
-    credentials: true,
-};
-app.use(cors(corsOptions));
+    origin: 'http://localhost:3000',
+    credentials: true
+}
+app.use(cors(corsOptions))
+
+// const corsOptions = {
+//     origin: 'https://3000-chiragbang-jobportal-1r2ru5p7j8i.ws-us116.gitpod.io',  // Replace with your frontend URL
+//     credentials: true,
+// };
+// app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 8000;
 

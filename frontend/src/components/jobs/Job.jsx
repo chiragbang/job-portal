@@ -1,10 +1,22 @@
+"use client"
 import { Bookmark, BookmarkPlus, Info } from 'lucide-react'
 import React from 'react'
 import { Button } from '../ui/button'
 import { Avatar, AvatarImage } from '../ui/avatar'
 import { Badge } from '../ui/badge'
+import { useRouter } from 'next/navigation'
 
 const Job = () => {
+     
+    const id = "djhgchdbnkmqncb"
+
+    const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/description/${id}`);
+  };
+
+
     return (
         <div className='p-5 rounded-md shadow-xl border border-gray-100 bg-white'>
             <div className='flex items-center justify-between'>
@@ -46,7 +58,7 @@ const Job = () => {
 
             <div className="flex items-center gap-4 mt-4">
       {/* Details Button */}
-      <Button className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-shadow shadow-md">
+      <Button onClick={handleClick} className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-shadow shadow-md">
         <Info className="w-5 h-5" />
         Details
       </Button>
