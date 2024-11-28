@@ -1,29 +1,36 @@
+"use client"
 import AppliedJobTable from '@/components/profile/AppliedJobTable'
+import UpdateProfileDialog from '@/components/profile/UpdateProfileDialog'
 import Navbar from '@/components/shared/Navbar'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import store from '@/redux/store'
 import { Contact, Mail, Pen } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 
-const skills = [
-  "JavaScript",
-  "React",
-  "Node.js",
-  "MongoDB",
-  "HTML",
-  "CSS",
-  "Express.js",
-  "Git",
-  "TypeScript",
-  "Redux"
-];
+// const skills = [
+//   "JavaScript",
+//   "React",
+//   "Node.js",
+//   "MongoDB",
+//   "HTML",
+//   "CSS",
+//   "Express.js",
+//   "Git",
+//   "TypeScript",
+//   "Redux"
+// ];
+
+const isHaveResume = true;
 
 const page = () => {
+  const [open, setOpen] = useState(false);
+  const { user } = useSelector(store => store.auth);
 
-  const isHaveResume = true;
   return (
     <div>
       <Navbar />
@@ -34,22 +41,22 @@ const page = () => {
               <AvatarImage src='/companyLogo.png' alt='profile' />
             </Avatar>
             <div>
-              <h1 className='font-medium text-xl'>Full Name</h1>
-              <p className='font-sm text-md text-gray-500'>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+              <h1 className='font-medium text-xl'>{user?.fullname}</h1>
+              <p className='font-sm text-md text-gray-500'>{user?.profile?.bio}</p>
             </div>
           </div>
-          <Button variant="ghost" className="text-right bg-white">
+          <Button onClick={() => setOpen(true)} variant="ghost" className="text-right bg-white">
             <Pen />
           </Button>
         </div>
         <div className='my-5'>
           <div className='flex items-center gap-3 my-2'>
             <Mail />
-            <span>chiragbang@gmail.com</span>
+            <span>{user?.profile?.bio}</span>
           </div>
           <div className='flex items-center gap-3 my-2'>
             <Contact />
-            <span>9467757042</span>
+            <span>{user?.phoneNumber}</span>
           </div>
         </div>
 
@@ -59,8 +66,8 @@ const page = () => {
           <Label className="text-md font-bold">Skills</Label>
           <div className='flex items-center gap-2 flex-wrap'>
             {
-              skills.length > 0 ? (
-                skills.map((item, index) => (
+              user?.profile?.skills.length > 0 ? (
+                user?.profile?.skills.map((item, index) => (
                   <Badge
                     key={index}
                     variant="outline"
@@ -77,20 +84,29 @@ const page = () => {
         </div>
 
         {/* Resume */}
-        <div className='grid w-full max-w-sm items-center gap-1.5 my-5'>
-          <Label className="text-md font-bold">Resume</Label>
-          {
-            isHaveResume ? <Link className='text-blue-500 w-full hover:underline cursor-pointer' target='blank' href="https://chatgpt.com">My Resume</Link> : <span>No Resume Available</span>
-          }
-        </div>
-
+        <div className="grid w-full max-w-sm items-center gap-1.5 my-5">
+  <Label className="text-md font-bold">Resume</Label>
+  {isHaveResume && user?.profile?.resume ? (
+    <Link
+      className="text-blue-500 w-full hover:underline cursor-pointer"
+      target="_blank"
+      href={user.profile.resume}
+    >
+      {user.profile.resumeOriginalName || "Download Resume"}
+    </Link>
+  ) : (
+    <span className="text-gray-500">No Resume Available</span>
+  )}
+</div>
         {/* Applied Jobs */}
-        
+
       </div>
       <div className='max-w-4xl mx-auto bg-white rounded-2xl'>
-          <h1 className='font-bold text-lg my-5'>Applied Jobs</h1>
-          <AppliedJobTable/>
-        </div>
+        <h1 className='font-bold text-lg my-5'>Applied Jobs</h1>
+        <AppliedJobTable />
+      </div>
+
+      <UpdateProfileDialog open={open} setOpen={setOpen} />
     </div>
   )
 }

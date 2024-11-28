@@ -1,6 +1,8 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs"
 import jwt from 'jsonwebtoken';
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 
 
@@ -125,58 +127,69 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
-        const file = req.file
-    
+        const file = req.file;
 
-        // cloudinary implementation for resume
-        let skillsArray;
+        const fileUri = getDataUri(file);
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+
+
+
+        // Initialize skillsArray
+        let skillsArray = [];
         if (skills) {
-            skillsArray = array.split(",")
+            // Split the skills string into an array
+            skillsArray = skills.split(","); 
         }
-        const userId = req.id; //middleware authentication
+
+        const userId = req.id; // middleware authentication
         let user = await User.findById(userId);
 
         if (!user) {
             return res.status(400).json({
                 message: "User Not Found",
-                success: false
-            })
+                success: false,
+            });
         }
 
-        if (fullname) user.fullname = fullname
-        if (email) user.email = email
-        if (phoneNumber) user.phoneNumber = phoneNumber
-        if (bio) user.profile.bio = bio
-        if (skills) user.profile.skills = skillsArray
+        // Update user details
+        if (fullname) user.fullname = fullname;
+        if (email) user.email = email;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (bio) user.profile.bio = bio;
+        if (skills) user.profile.skills = skillsArray;
 
-        // user.fullname = fullname,
-        //     user.email = email,
-        //     user.phoneNumber = phoneNumber,
-        //     user.profile.bio = bio,
-        //     user.profile.skills = skillsArray
+        // Resume handling logic (if any) should be added here
 
+        if(cloudResponse){
+            user.profile.resume = cloudResponse.secure_url; //save the cloudinary url
+            user.profile.resumeOriginalName = file.originalname; //original file name
+        }
 
-        //Resume comes here later:
+        console.log("Uploaded file URL:", cloudResponse.secure_url);
 
+        // Save updated user data
         await user.save();
 
+        // Prepare user object for response
         user = {
             _id: user._id,
             fullname: user.fullname,
             email: user.email,
             phoneNumber: user.phoneNumber,
             role: user.role,
-            profile: user.profile
-        }
+            profile: user.profile,
+        };
 
         return res.status(200).json({
             message: "Profile Updated successfully",
             user,
-            success: true
-        })
-
+            success: true,
+        });
     } catch (error) {
-        console.log(error)
+        console.error("Error updating profile:", error);
+        res.status(500).json({
+            message: "An error occurred while updating the profile",
+            success: false,
+        });
     }
-
-}
+};
