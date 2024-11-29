@@ -90,9 +90,9 @@ const page = () => {
     <Link
       className="text-blue-500 w-full hover:underline cursor-pointer"
       target="_blank"
-      href={user.profile.resume}
+      href={user?.profile?.resume}
     >
-      {user.profile.resumeOriginalName || "Download Resume"}
+      {user?.profile?.resumeOriginalName || "Download Resume"}
     </Link>
   ) : (
     <span className="text-gray-500">No Resume Available</span>
